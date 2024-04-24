@@ -7,7 +7,7 @@ const bookValidator = (req, res, next) => {
         author: Joi.string().required(),
         category: Joi.string().required(),
         rating: Joi.number().required().default(0),
-        publicationYear: Joi.date().required(),
+        publicationYear: Joi.string().min(4).max(4).required(),
         ISBN:Joi.string().required().pattern(/^[0-9]{10,13}$/),  //ISBN should be of length between 10 and 13 only
         userId:Joi.string().required().pattern(/^[0-9a-fA-F]{24}$/) // userId should a valid ObjectId
     })

@@ -1,14 +1,14 @@
 const express=require("express");
 const { createBook, getBooks, getBookbyId, updateBook, deleteBookById } = require("../controller/bookController");
 const bookValidator = require("../validator/bookValidator");
-const bookUpdateValidator = require("../controller/bookUpdateController");
+const bookUpdateValidator = require("../validator/bookUpdatevalidator");
 const validateToken = require("../../middleware/validatetokenHandler");
 const router=express.Router();
 
 //middleware /private
 router.use(validateToken)
 
-//retrive all the books
+//retrive all the books + filter 
 router.get("/",getBooks)
 
 //fetch the book by id

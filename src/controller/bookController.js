@@ -41,17 +41,29 @@ const createBook = async (req, res) => {
     }
 };
 
-//get books
+//-------------------------get books-----------------
+
 const getBooks = async (req, res) => {
     try {
-        const books = await Book.find();
+        let filters = {};
+        if (req.query.author) {
+            filters.author = { $regex: req.query.author, $options: 'i' }; // Case-insensitive regex
+        }
+        if (req.query.publicationYear) {
+            // const year = new Date(req.query.publicationYear);
+            filters.publicationYear = req.query.publicationYear; // Assuming you want books published within the same year
+
+        }
+
+        const books = await Book.find(filters);
         res.status(200).json(books);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 }
 
-//get a single book by ID
+
+//-----------------------------get a single book by ID------------------------
 const getBookbyId = async (req, res) => {
     try {
         const Id = req.params.id;
@@ -78,23 +90,23 @@ const getBookbyId = async (req, res) => {
     }
 }
 
-//update book by id
+//------------------------------update book by id-----------------------------
 
 const updateBook = async (req, res) => {
     try {
-        const { title, description, userId, ISBN, author, category, rating, publicationYear } = req.body;
+        const { title, description, author, category, rating, publicationYear } = req.body;
 
         // Check if user has permission to update the book
         const savedBook = await Book.findById(req.params.id);
         if (!savedBook) {
             return res.status(404).json({ message: 'Book not found' });
         }
-        if (savedBook.userId.toString() !== userId) {
+        if (savedBook.userId.toString() !== req.user.userId) {
             return res.status(403).json({ message: "You don't have permission to update this book" });
         }
 
         // Update the book
-        const updatedBook = await Book.findByIdAndUpdate(req.params.id, { title, description, userId, ISBN, author, category, rating, publicationYear }, { new: true });
+        const updatedBook = await Book.findByIdAndUpdate(req.params.id, { title, description, author, category, rating, publicationYear }, { new: true });
 
         if (!updatedBook) {
             return res.status(404).json({ message: 'Book not found' });
@@ -107,7 +119,7 @@ const updateBook = async (req, res) => {
     }
 };
 
-//delete book by id
+//-----------------------------delete book by id-------------------
 
 const deleteBookById = async (req, res) => {
     try {
@@ -115,13 +127,16 @@ const deleteBookById = async (req, res) => {
 
         // Check if the book exists
         const book = await Book.findById(bookId);
+
         if (!book) {
             return res.status(404).json({ message: 'Book not found' });
         }
 
+        if (book.userId.toString() !== req.user.userId) {
+            res.status(400).json({ message: "access denied" })
+        }
         // Delete the book
         await Book.findByIdAndDelete(bookId);
-
         res.status(200).json({ message: 'Book deleted successfully' });
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -130,4 +145,4 @@ const deleteBookById = async (req, res) => {
 
 
 
-module.exports = { createBook, getBooks, getBookbyId, updateBook,deleteBookById }
+module.exports = { createBook, getBooks, getBookbyId, updateBook, deleteBookById }

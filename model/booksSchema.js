@@ -33,7 +33,7 @@ const booksSchema=mongoose.Schema({
         trim:true
     },
     publicationYear:{
-        type:Date,
+        type:String,
         required:true,
     }
 },{timestamps:true});

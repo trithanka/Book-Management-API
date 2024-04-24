@@ -7,8 +7,7 @@ const bookUpdateValidator = (req, res, next) => {
         author: Joi.string().required(),
         category: Joi.string().required(),
         rating: Joi.number().required().default(0),
-        publicationYear: Joi.date().required(),
-        userId:Joi.string().required().pattern(/^[0-9a-fA-F]{24}$/) // userId should a valid ObjectId
+        publicationYear: Joi.date().required()
     })
 
     const { error, value } = schema.validate(req.body);
